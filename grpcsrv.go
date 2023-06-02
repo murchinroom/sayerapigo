@@ -35,7 +35,7 @@ func newSayerServiceServerImpl(sayer Sayer) *sayerServiceServerImpl {
 func (s *sayerServiceServerImpl) Say(
 	ctx context.Context, in *sayerv1.SayRequest) (
 	*sayerv1.SayResponse, error) {
-	logger := slog.With("role", ellipsis.Centering(in.Text, 9), "text", ellipsis.Centering(in.Text, 9))
+	logger := slog.With("role", ellipsis.Centering(in.Role, 9), "text", ellipsis.Centering(in.Text, 9))
 
 	resp, err := s.say(ctx, in)
 	if err != nil {
