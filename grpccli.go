@@ -12,8 +12,10 @@ package sayerapigo
 import (
 	"context"
 
+	"golang.org/x/exp/slog"
 	"google.golang.org/grpc"
 
+	"github.com/cdfmlr/ellipsis"
 	"github.com/cdfmlr/pool"
 	sayerv1 "github.com/murchinroom/sayerapigo/proto"
 )
@@ -44,15 +46,22 @@ func NewSayerClient(addr string) (*SayerClient, error) {
 // Say implements the Sayer interface. So SayerClient can be used
 // as a Sayer.
 func (c *SayerClient) Say(role string, text string) (format string, audio []byte, err error) {
+	logger := slog.With("role", ellipsis.Centering(role, 9), "text", ellipsis.Centering(text, 9))
+
 	resp, err := c.client.Say(context.Background(), &sayerv1.SayRequest{
 		Role: role,
 		Text: text,
 	})
 	if err != nil {
+		logger.Error("[SayerClient] Say (RPC) failed", "err", err)
+
 		c.failed++
 		return "", nil, err
 	}
 	c.failed = 0
+
+	logger.Info("[SayerClient] Say (RPC) succeeded.")
+
 	return resp.Format, resp.Audio, nil
 }
 

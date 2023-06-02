@@ -3,6 +3,7 @@ module github.com/murchinroom/sayerapigo
 go 1.19
 
 require (
+	github.com/cdfmlr/ellipsis v0.0.1
 	github.com/cdfmlr/pool v0.0.1
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	google.golang.org/grpc v1.55.0

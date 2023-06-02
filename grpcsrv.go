@@ -8,7 +8,6 @@ import (
 	"net"
 	"os"
 	"reflect"
-	"strings"
 
 	"golang.org/x/exp/slog"
 	"google.golang.org/grpc"
@@ -16,6 +15,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
+	"github.com/cdfmlr/ellipsis"
 	sayerv1 "github.com/murchinroom/sayerapigo/proto"
 )
 
@@ -35,33 +35,15 @@ func newSayerServiceServerImpl(sayer Sayer) *sayerServiceServerImpl {
 func (s *sayerServiceServerImpl) Say(
 	ctx context.Context, in *sayerv1.SayRequest) (
 	*sayerv1.SayResponse, error) {
+	logger := slog.With("role", ellipsis.Centering(in.Text, 9), "text", ellipsis.Centering(in.Text, 9))
 
 	resp, err := s.say(ctx, in)
 	if err != nil {
-		slog.Warn("sayerServiceServer Say failed.", "err", err)
+		logger.Warn("[sayerServiceServer] Say (TTS) failed.", "err", err)
 		return nil, err
 	}
-	slog.Info("sayerServiceServer Say succeeded.", "text", ellipsis(in.Text, 10))
+	logger.Info("[sayerServiceServer] Say (TTS) succeeded.")
 	return resp, nil
-}
-
-// ellipsis long s -> "front...end"
-func ellipsis(s string, n int) string {
-	r := []rune(s)
-
-	if len(r) <= n {
-		return s
-	}
-
-	n -= 3
-	h := n / 2
-
-	var sb strings.Builder
-	sb.WriteString(string(r[:h]))
-	sb.WriteString("...")
-	sb.WriteString(string(r[len(r)-h:]))
-
-	return sb.String()
 }
 
 func (s *sayerServiceServerImpl) say(
